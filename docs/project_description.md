@@ -1,7 +1,6 @@
-# Hidden Suicide Risk: To what extent can routinely recorded health information predict a patient's near-term risk of suicide, and does this system accurately flag high-risk individuals who screen negative (PHQ-8 < 10) for depression?
+# Hidden Suicide Risk: Can routinely recorded health information identify suicidal ideation that a depression screen misses?
 
-*Data Science in Health Care, HSLU MSc Applied Information and Data Science.*
-*Preliminary study due 09.10.2026 · final hand-in 28.10.2026 · presentation 30.10.2026.*
+*Data Science in Health Care.*
 
 ## 1. Problem statement
 
@@ -13,20 +12,28 @@ At the same time, an electronic health record already holds structured informati
 
 **Main research question**
 
-> To what extent can routinely recorded health information predict a patient's near-term risk of suicide, and does this system accurately flag high-risk individuals who screen negative (PHQ-8 < 10) for depression?
+> To what extent can routinely recorded health information identify adults with current suicidal ideation, and does it add value beyond a depression screen, in particular for adults who screen negative (PHQ-8 < 10)?
 
 **Sub-questions**
 
-1. Which routinely recorded factors contribute most to the risk estimate, and are they clinically plausible?
-2. How should the severe class imbalance (about 1:26) be handled: class weighting, SMOTE, or no correction?
-3. Does performance hold when a model trained on older survey waves is applied to newer ones, and is it similar across sex, age groups and ethnicity?
+1. How should the severe class imbalance (about 1:26) be handled: class weighting, SMOTE, or no correction?
+2. Does performance hold when a model trained on older survey waves is applied to newer ones, and is it similar across sex, age groups and ethnicity?
 
-**Hypotheses**
+**Hypotheses** (all tested on the 2015–2018 test set with paired bootstrap 95% CIs)
+
+*Main question*
 
 - **H1:** A model using routine health data achieves a PR-AUC at least **twice the outcome prevalence**, and higher than a demographics-only model (CI of the difference excludes 0).
-- **H2:** Adding routine health data to the PHQ-8 score increases PR-AUC compared with PHQ-8 alone (paired bootstrap CI of the difference excludes 0).
-- **H3:** Gradient boosting achieves a higher PR-AUC than penalised logistic regression on the same features.
-- **H4:** Among adults who screen negative on depression (PHQ-8 < 10), the routine-data model ranks people with suicidal ideation above those without better than chance (ROC-AUC CI lies above 0.5).
+- **H2:** Adding routine health data to the PHQ-8 score increases PR-AUC compared with PHQ-8 alone (CI of the difference excludes 0).
+- **H3:** Among adults who screen negative on depression (PHQ-8 < 10), the routine-data model ranks people with suicidal ideation above those without better than chance (ROC-AUC CI lies above 0.5), and its PR-AUC is at least twice the prevalence within this group.
+
+*Sub-question 1 (class imbalance)*
+
+- **H4:** Class weighting and SMOTE do not improve PR-AUC over the uncorrected model, but they worsen calibration (higher Brier score; CI of the difference excludes 0), because they shift predicted probabilities away from the true prevalence [5].
+
+*Sub-question 2 (robustness)*
+
+- **H5:** The model trained on 2005–2014 keeps its discrimination on 2015–2018 (test ROC-AUC within 0.05 of the cross-validated ROC-AUC), and ROC-AUC differs by less than 0.05 between sexes, age groups and ethnic groups. ROC-AUC is used here rather than PR-AUC because PR-AUC depends on prevalence, which differs between waves and subgroups.
 
 ## 3. Data sources
 
@@ -60,14 +67,14 @@ At the same time, an electronic health record already holds structured informati
 - **L2- or elastic-net logistic regression**, interpretable as odds ratios;
 - **gradient boosting** (scikit-learn `HistGradientBoostingClassifier` or XGBoost).
 
-The imbalance comparison (sub-question 2) runs each model with no correction, with `class_weight="balanced"`, and with SMOTE applied inside the CV folds only.
+The imbalance comparison (sub-question 1, H4) runs each model with no correction, with `class_weight="balanced"`, and with SMOTE applied inside the CV folds only.
 
 **Step 5 — Evaluation.**
 
 - Primary metric: **PR-AUC**, compared against the prevalence baseline. Secondary: ROC-AUC, Brier score and a calibration plot.
 - Clinical operating point: **recall and precision when flagging the top 5% of patients**, reported as "flag 1 in 20 patients → catch X% of cases, of whom Y% are true positives".
 - Hypothesis tests via bootstrap CIs on the test set.
-- Fairness: PR-AUC and recall at top 5% by sex, age group and ethnicity.
+- Fairness (H5): ROC-AUC, PR-AUC relative to subgroup prevalence, and recall at top 5% by sex, age group and ethnicity.
 
 **Step 6 — Explainability.** SHAP values for the gradient-boosting model and odds ratios for logistic regression. Global importance ranking plus 2–3 individual patient explanations (e.g. "flagged mainly because of antipsychotic prescription, poor self-rated health and not working").
 
@@ -105,3 +112,4 @@ NLP on clinical notes (ClinicalBERT), multimodal late fusion, and 30-day post-di
 2. Ahmedani, B. K. et al. (2014). Health care contacts in the year before suicide death. *Journal of General Internal Medicine*, 29(6), 870–877.
 3. Kroenke, K., Spitzer, R. L., & Williams, J. B. W. (2001). The PHQ-9: validity of a brief depression severity measure. *Journal of General Internal Medicine*, 16(9), 606–613.
 4. Centers for Disease Control and Prevention, National Center for Health Statistics. *National Health and Nutrition Examination Survey data, 2005–2018*. https://wwwn.cdc.gov/nchs/nhanes/, accessed 25.09.2026.
+5. van den Goorbergh, R., van Smeden, M., Timmerman, D., & Van Calster, B. (2022). The harm of class imbalance corrections for risk prediction models: illustration and simulation using logistic regression. *Journal of the American Medical Informatics Association*, 29(9), 1525–1534.

@@ -1,0 +1,20 @@
+# Data never goes into git: everyone re-downloads it with scripts/fetch_data.py.
+data/
+*.xpt
+*.csv.gz
+*.part
+
+# Credentials
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
