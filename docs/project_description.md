@@ -50,7 +50,17 @@ At the same time, an electronic health record already holds structured informati
 
 ## 4. Approach and methodology
 
-**Step 1 — Acquisition and harmonisation (week 1).** Download the 91 `.xpt` files and merge all modules on `SEQN` per cycle. Restrict to adults (18+) with a complete PHQ-9. Harmonise variables that change between cycles, for example `HUQ050` → `HUQ051` (number of healthcare visits) and the new sleep module from 2015 onward. Recode "refused / don't know" (7/9, 77/99) to missing. SAS transport stores 0 as ≈5·10⁻⁷⁹, so values must be rounded on import.
+**Step 1 — Acquisition and harmonisation (week 1, done).** Download the 91 `.xpt` files, verified against SHA-256 checksums, and merge all modules on `SEQN` per cycle. Restrict to adults (18+) with a complete PHQ-9. SAS transport stores 0 as ≈5·10⁻⁷⁹, so these values are set to 0 on import. Every variable and rule is listed in `docs/codebook.md`. Variables that change between cycles are harmonised as follows:
+
+- *"Refused / don't know" codes depend on the variable* (7/9, 77/99 or none) and are recoded per variable, because 7 and 9 are real answers for some variables, such as hours of sleep.
+- *Healthcare visits:* `HUQ050` (2005–2012) → `HUQ051` (2013+). The finer 2013 categories nest exactly into the earlier ones and are collapsed to them. The 2013 question no longer counts emergency-room and home visits, a definitional break we report.
+- *Sleep hours:* `SLD010H` (whole hours, 12 = "12 or more") → `SLD012` in the new 2015 sleep module (half hours, up to 14.5); both are clipped to 2–12 h.
+- *Age* is top-coded at 85 in 2005–06 and at 80 afterwards; we use 80 throughout.
+- *Education* for 18–19-year-olds comes from the youth question `DMDEDUC3`, because the adult question starts at 20.
+- *High cholesterol* was asked until 2010 only if cholesterol had been checked; people never checked are coded "no", as everyone is asked from 2011.
+- *Age coverage* differs between cycles: smoking and cholesterol are asked from 20 until 2012 and from 18 afterwards, hard-drug use covers ages 20–59 in 2005–06, 20–69 in 2007–08 and 18–69 from 2009, and marital status covers 14+ in 2005–06 and 20+ later. Each variable is kept only for the ages asked in every cycle (20+, drug use 20–59), so missingness does not reveal the survey year in the temporal validation (H5).
+
+Outputs: one row per adult (`nhanes_2005_2018.parquet`), prescriptions in long format (one row per drug), the 2021–23 PHQ-9 file, and tables of sample size and missingness per cycle.
 
 **Step 2 — Feature engineering (week 1–2).**
 
@@ -58,7 +68,7 @@ At the same time, an electronic health record already holds structured informati
 - *Multimorbidity:* count of 10 diagnosed chronic conditions (arthritis, heart disease, stroke, COPD, cancer, diabetes, hypertension, …).
 - *Healthcare use:* hospital stay and mental-health visit in the past year, number of visits, self-rated health.
 - *Social:* poverty-income ratio, not working, uninsured, marital status, education.
-- *Structural missingness:* the drug-use module (`DUQ`) is asked only to ages 18–59, so we add a missing-indicator rather than imputing it as "no".
+- *Structural missingness:* drug use is only available for ages 20–59, and chronic conditions, smoking and marital status only from age 20 (step 1). We add missing-indicators rather than imputing these as "no".
 
 **Step 3 — Exploratory analysis.** Report prevalence by cycle, sex, age and ethnicity with the NHANES survey weights (`WTMEC2YR` combined over cycles, strata `SDMVSTRA`, PSU `SDMVPSU`) so the figures describe the US adult population. Produce univariate risk ratios and a correlation check for collinear features (e.g. antidepressant use vs. mental-health visit).
 
