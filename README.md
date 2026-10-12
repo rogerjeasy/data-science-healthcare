@@ -1,6 +1,6 @@
 # Hidden Suicide Risk — Data Science in Health Care
 
-Using NHANES 2005–2018, we test whether routinely recorded health information can identify adults with suicidal ideation, including those a depression screen misses (PHQ-8 < 10). Research question, hypotheses and plan: [`docs/project_description.md`](docs/project_description.md).
+Using NHANES 2005–2018, we test whether routinely recorded health information can identify adults with suicidal ideation, including those a depression screen misses (PHQ-9 < 10). Research question, hypotheses and plan: [`docs/project_description.md`](docs/project_description.md).
 
 | Milestone                    | Date       |
 | ---------------------------- | ---------- |
@@ -14,18 +14,22 @@ Using NHANES 2005–2018, we test whether routinely recorded health information 
 data-science-healthcare/
 ├── docs/
 │   ├── project_description.md    # research question, hypotheses, methods
-│   └── codebook.md               # every variable and its NHANES source (generated)
+│   ├── codebook.md               # every variable and its NHANES source (generated)
+│   └── harmonisation_rules.md    # appendix: every harmonisation rule (generated)
 ├── scripts/                      # command-line entry points, run in this order
-│   ├── fetch_data.py             # step 0: download raw data
+│   ├── fetch_data.py             # step 1a: download and verify the raw data
 │   ├── checksums.sha256          # SHA-256 of every raw file, so everyone has the same data
-│   └── build_dataset.py          # step 1: merge and harmonise
+│   └── build_dataset.py          # step 1b: merge and harmonise
 ├── src/hidden_risk/              # all reusable code; imported by scripts, notebooks and tests
 │   ├── config.py                 # paths, survey cycles, train/test split
+│   ├── sources.py                # list of raw files, download URLs, checksum check
 │   ├── io.py                     # read .xpt files (fixes SAS stored zeros)
 │   ├── variables.py              # variable list: sources per cycle, missing codes, harmonisation
 │   ├── harmonise.py              # merge modules on SEQN, apply variables.py
-│   ├── cohort.py                 # adults with a complete PHQ-9, outcome definition
-│   └── build.py                  # writes data/processed, reports/tables, docs/codebook.md
+│   ├── cohort.py                 # adults with a complete PHQ-9, outcome, depression screens
+│   ├── reports.py                # sample-size and missingness tables, codebook, appendix
+│   ├── build.py                  # runs step 1: writes data/processed, reports/tables, docs
+│   └── plotting.py               # one chart style for every figure
 ├── notebooks/                    # exploration only, numbered: 01_eda.ipynb, 02_...
 ├── reports/
 │   ├── tables/                   # aggregate tables (committed)
@@ -90,18 +94,16 @@ pip install -r requirements.txt
 python scripts/fetch_data.py
 ```
 
-This downloads about 210 MB (under a minute) into `data/raw/`:
+This downloads about 210 MB (under a minute) from [NHANES](https://wwwn.cdc.gov/nchs/nhanes/) into `data/raw/nhanes/`:
 
-| Source                                                | Files                                                                                                                                          |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [NHANES](https://wwwn.cdc.gov/nchs/nhanes/) 2005–2018 | 13 modules × 7 cycles:`DPQ`, `DEMO`, `RXQ_RX`, `HUQ`, `MCQ`, `DIQ`, `BPQ`, `SLQ`, `SMQ`, `DUQ`, `OCQ`, `HIQ`, `BMX` |
-| NHANES extras                                         | `RXQ_DRUG` (drug class lookup), `DEMO_L` and `DPQ_L` (2021–23 trend check)                                                              |
-| [BFS](https://www.bfs.admin.ch/)                       | Suicides by method, sex and age; assisted suicide by sex and age (Swiss context only)                                                          |
+| Files | Content |
+| ----- | ------- |
+| 13 modules × 7 cycles (2005–2018) = 91 files | `DPQ`, `DEMO`, `RXQ_RX`, `HUQ`, `MCQ`, `DIQ`, `BPQ`, `SLQ`, `SMQ`, `DUQ`, `OCQ`, `HIQ`, `BMX` |
+| 3 extra files | `RXQ_DRUG` (drug class lookup for step 2), `DEMO_L` and `DPQ_L` (2021–23 trend check) |
 
-The run must end with **`Verified 97/97 files`**. Every file is checked against `scripts/checksums.sha256`, so a successful run means you have exactly the same data as the rest of the team.
+The run must end with **`Verified 94/94 files`**. Every file is checked against `scripts/checksums.sha256`, so a successful run means you have exactly the same data as the rest of the team.
 
 - **Safe to re-run:** files already present are skipped.
-- **One source only:** `python scripts/fetch_data.py nhanes` or `bfs`.
 - **Check without downloading:** `python scripts/fetch_data.py --verify-only`.
 - **A file "differs from the team's copy":** re-run with `--force`. If it still differs, the source has changed, so tell the team. Only after the team agrees do we run `--write-checksums` and commit the new `checksums.sha256`.
 - **All options:** `python scripts/fetch_data.py --help`.
@@ -112,15 +114,17 @@ The run must end with **`Verified 97/97 files`**. Every file is checked against 
 python scripts/build_dataset.py
 ```
 
-This takes a few seconds. It merges the 13 modules of each cycle on `SEQN` and keeps adults (18+) with a complete PHQ-9. It also harmonises variables that change between cycles and turns "refused / don't know" codes into missing values. Every rule is listed in [`docs/codebook.md`](docs/codebook.md). It writes:
+This takes a few seconds. It first checks the raw files against the checksums and stops if one is missing or differs. It then merges the 13 modules of each cycle on `SEQN` and keeps adults (18+) with a complete PHQ-9. It also harmonises variables that change between cycles and turns "refused / don't know" codes into missing values. Every rule is listed in [`docs/harmonisation_rules.md`](docs/harmonisation_rules.md), every variable in [`docs/codebook.md`](docs/codebook.md). It writes:
 
 | File | Content |
 |---|---|
-| `data/processed/nhanes_2005_2018.parquet` | 36,259 adults, one row each: features, survey design, PHQ items, outcome `si`, `split` |
+| `data/processed/nhanes_2005_2018.parquet` | 36,259 adults, one row each: features, survey design, PHQ items and scores, outcome `si`, `split` |
 | `data/processed/nhanes_2005_2018_prescriptions.parquet` | Their prescriptions, one row per drug (for the medication mapping in step 2) |
 | `data/processed/nhanes_2021_2023_phq9.parquet` | 5,455 adults, PHQ-9 only (trend check) |
-| `reports/tables/cohort_by_cycle.csv` | Adults and suicidal-ideation cases per cycle |
+| `reports/tables/cohort_flow_by_cycle.csv` | Participants left after each selection step (all → adults → examined → complete PHQ-9) |
+| `reports/tables/cohort_by_cycle.csv` | Adults and suicidal-ideation cases per cycle, and the share of cases each depression screen misses |
 | `reports/tables/missingness_by_cycle.csv` | % missing per variable and cycle |
+| `docs/codebook.md`, `docs/harmonisation_rules.md` | Generated documentation: do not edit by hand |
 
 The run must end with a total of **36259 adults and 1366 SI cases**. Load the data in a notebook with:
 
@@ -130,7 +134,9 @@ from hidden_risk.config import DATA_PROCESSED
 df = pd.read_parquet(DATA_PROCESSED / "nhanes_2005_2018.parquet")
 ```
 
-**Check everything:** `python -m pytest` runs the tests, including a check that the built dataset matches the numbers in the project description.
+**Two PHQ scores:** `phq9_score` / `phq9_positive` are the depression screen as used in practice (PHQ-9 ≥ 10). They contain item 9, which is the outcome, so they must not be used as model features. `phq8_score` / `phq8_positive` leave item 9 out and are safe as a predictor.
+
+**Check everything:** `python -m pytest` runs the tests, including checks that the built dataset matches the numbers in the project description.
 
 ## 4. Explore the data
 
@@ -148,4 +154,3 @@ jupyter lab notebooks/01_data_overview.ipynb
 ## Data sources and licences
 
 - CDC / NCHS, *National Health and Nutrition Examination Survey*, 2005–2018 and 2021–2023. Public domain.
-- Bundesamt für Statistik (BFS), tables T 14.03.04.01.11, .12 and .14, via opendata.swiss.

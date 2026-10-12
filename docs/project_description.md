@@ -1,10 +1,10 @@
 # Hidden Suicide Risk: Can routinely recorded health information identify suicidal ideation that a depression screen misses?
 
-*Data Science in Health Care.*
+*Data Science in Health Care. Sections 1–6 follow the preliminary study submitted on 09.10.2026.*
 
 ## 1. Problem statement
 
-Suicide is a leading cause of preventable death. Switzerland records about 1,000 suicides per year (996 in 2024, 72% men) [1]. Many people who die by suicide were in contact with a physician in the preceding year [2]. The routine tool for spotting mental distress in primary care is a depression questionnaire such as the PHQ-9, with a positive screen at a score of 10 or more [3]. **But suicidal thoughts are not limited to people who screen positive for depression.** In our pilot analysis of NHANES, **42% of adults who reported thoughts of self-harm or of being better off dead scored below 10 on the other eight PHQ items**, so a standard depression screen would miss them.
+Suicide is a leading cause of preventable death. More than 720,000 people die by suicide worldwide every year. Many people who die by suicide were in contact with a physician in the preceding year [1]. The routine tool for spotting mental distress in primary care is a depression questionnaire such as the PHQ-9, with a positive screen at a score of 10 or more [2]. **But suicidal thoughts are not limited to people who screen positive for depression.** In our pilot analysis of NHANES, **42% of adults who reported thoughts of self-harm or of being better off dead scored below 10 on the other eight PHQ items**, so a standard depression screen would miss them.
 
 At the same time, an electronic health record already holds structured information a clinician rarely has time to cross-reference: prescriptions (antidepressants, opioids, benzodiazepines), healthcare use (hospital stays, mental-health visits), chronic conditions, sleep problems, employment and insurance status. **It is unclear whether this routinely recorded information carries enough signal to flag suicidal ideation, especially in patients the depression screen does not catch.** This project quantifies that signal on real, nationally representative health data.
 
@@ -12,7 +12,7 @@ At the same time, an electronic health record already holds structured informati
 
 **Main research question**
 
-> To what extent can routinely recorded health information identify adults with current suicidal ideation, and does it add value beyond a depression screen, in particular for adults who screen negative (PHQ-8 < 10)?
+> To what extent can routinely recorded health information identify adults with current suicidal ideation, and does it add value beyond a depression screen, in particular for adults who screen negative (PHQ-9 < 10)?
 
 **Sub-questions**
 
@@ -24,16 +24,15 @@ At the same time, an electronic health record already holds structured informati
 *Main question*
 
 - **H1:** A model using routine health data achieves a PR-AUC at least **twice the outcome prevalence**, and higher than a demographics-only model (CI of the difference excludes 0).
-- **H2:** Adding routine health data to the PHQ-8 score increases PR-AUC compared with PHQ-8 alone (CI of the difference excludes 0).
-- **H3:** Among adults who screen negative on depression (PHQ-8 < 10), the routine-data model ranks people with suicidal ideation above those without better than chance (ROC-AUC CI lies above 0.5), and its PR-AUC is at least twice the prevalence within this group.
+- **H2:** Adding routine health data to the PHQ-9 score increases PR-AUC compared with PHQ-9 alone (CI of the difference excludes 0).
 
 *Sub-question 1 (class imbalance)*
 
-- **H4:** Class weighting and SMOTE do not improve PR-AUC over the uncorrected model, but they worsen calibration (higher Brier score; CI of the difference excludes 0), because they shift predicted probabilities away from the true prevalence [5].
+- **H3:** Class weighting and SMOTE do not improve PR-AUC over the uncorrected model, but they worsen calibration (higher Brier score; CI of the difference excludes 0), because they shift predicted probabilities away from the true prevalence [3].
 
 *Sub-question 2 (robustness)*
 
-- **H5:** The model trained on 2005–2014 keeps its discrimination on 2015–2018 (test ROC-AUC within 0.05 of the cross-validated ROC-AUC), and ROC-AUC differs by less than 0.05 between sexes, age groups and ethnic groups. ROC-AUC is used here rather than PR-AUC because PR-AUC depends on prevalence, which differs between waves and subgroups.
+- **H4:** The model trained on 2005–2014 keeps its discrimination on 2015–2018 (test ROC-AUC within 0.05 of the cross-validated ROC-AUC), and ROC-AUC differs by less than 0.05 between sexes, age groups and ethnic groups. ROC-AUC is used here rather than PR-AUC because PR-AUC depends on prevalence, which differs between waves and subgroups.
 
 ## 3. Data sources
 
@@ -42,25 +41,14 @@ At the same time, an electronic health record already holds structured informati
 | **NHANES** (US CDC / NCHS) [4]                                    | Individual-level interview and examination data, linked by the respondent ID`SEQN`                                                                                                                                                                                                                                                                                                    | 7 cycles 2005–2018 →**36,259 adults** with a complete PHQ-9, **1,366** with suicidal ideation (3.8%) | Main modelling dataset                      |
 | NHANES modules used                                                     | `DPQ` (PHQ-9), `DEMO` (age, sex, ethnicity, education, income ratio, marital status, survey weights), `RXQ_RX` (prescription drug names), `HUQ` (self-rated health, hospital stay, mental-health visit), `MCQ`/`DIQ`/`BPQ` (chronic conditions), `SLQ` (sleep trouble), `SMQ` (smoking), `DUQ` (drug use), `OCQ` (employment), `HIQ` (insurance), `BMX` (BMI) | 13 modules × 7 cycles = 91 files                                                                                  | Feature construction                        |
 | NHANES 2021–2023 (`DPQ_L`)                                           | PHQ-9 only (the public drug file lacks drug names)                                                                                                                                                                                                                                                                                                                                      | 5,455 adults                                                                                                       | Descriptive trend check only                |
-| **Swiss Federal Statistical Office (BFS)** via opendata.swiss [1] | Suicides by method, sex and age (1995–2024); assisted suicide by sex and age (2003–2024)                                                                                                                                                                                                                                                                                              | Aggregate tables                                                                                                   | Swiss context and motivation (not modelled) |
 
 **Outcome:** `si = 1` if PHQ-9 item 9 ("thoughts that you would be better off dead, or of hurting yourself") is answered on at least *several days* in the past two weeks. A stricter outcome (*more than half the days*, 424 cases, ≈1.2%) is used as a sensitivity analysis.
 
-**Leakage rule:** PHQ items 1–8 are **excluded** from the "routine data" feature set and enter only as the PHQ-8 score in the explicit comparison (H2).
+**Leakage rule:** PHQ items 1–9 are **excluded** from the "routine data" feature set and enter only as the PHQ-9 score in the explicit comparison (H2).
 
 ## 4. Approach and methodology
 
-**Step 1 — Acquisition and harmonisation (week 1, done).** Download the 91 `.xpt` files, verified against SHA-256 checksums, and merge all modules on `SEQN` per cycle. Restrict to adults (18+) with a complete PHQ-9. SAS transport stores 0 as ≈5·10⁻⁷⁹, so these values are set to 0 on import. Every variable and rule is listed in `docs/codebook.md`. Variables that change between cycles are harmonised as follows:
-
-- *"Refused / don't know" codes depend on the variable* (7/9, 77/99 or none) and are recoded per variable, because 7 and 9 are real answers for some variables, such as hours of sleep.
-- *Healthcare visits:* `HUQ050` (2005–2012) → `HUQ051` (2013+). The finer 2013 categories nest exactly into the earlier ones and are collapsed to them. The 2013 question no longer counts emergency-room and home visits, a definitional break we report.
-- *Sleep hours:* `SLD010H` (whole hours, 12 = "12 or more") → `SLD012` in the new 2015 sleep module (half hours, up to 14.5); both are clipped to 2–12 h.
-- *Age* is top-coded at 85 in 2005–06 and at 80 afterwards; we use 80 throughout.
-- *Education* for 18–19-year-olds comes from the youth question `DMDEDUC3`, because the adult question starts at 20.
-- *High cholesterol* was asked until 2010 only if cholesterol had been checked; people never checked are coded "no", as everyone is asked from 2011.
-- *Age coverage* differs between cycles: smoking and cholesterol are asked from 20 until 2012 and from 18 afterwards, hard-drug use covers ages 20–59 in 2005–06, 20–69 in 2007–08 and 18–69 from 2009, and marital status covers 14+ in 2005–06 and 20+ later. Each variable is kept only for the ages asked in every cycle (20+, drug use 20–59), so missingness does not reveal the survey year in the temporal validation (H5).
-
-Outputs: one row per adult (`nhanes_2005_2018.parquet`), prescriptions in long format (one row per drug), the 2021–23 PHQ-9 file, and tables of sample size and missingness per cycle.
+**Step 1 — Acquisition and harmonisation (week 1, done).** Download the 91 `.xpt` files, verified against SHA-256 checksums, and merge all modules on `SEQN` per cycle. Restrict to adults (18+) with a complete PHQ-9. SAS transport stores 0 as ≈5·10⁻⁷⁹, so these values are set to 0 on import. "Refused / don't know" codes are recoded to missing per variable. Variables that change between cycles are harmonised, for example `HUQ050` → `HUQ051` (healthcare visits, 2013) and the new sleep module from 2015; each variable is kept only for the ages asked in every cycle. All rules are listed in the appendix, [`harmonisation_rules.md`](harmonisation_rules.md). Outputs: one row per adult, prescriptions in long format (one row per drug), the 2021–23 PHQ-9 file, and tables of sample size and missingness per cycle.
 
 **Step 2 — Feature engineering (week 1–2).**
 
@@ -72,19 +60,19 @@ Outputs: one row per adult (`nhanes_2005_2018.parquet`), prescriptions in long f
 
 **Step 3 — Exploratory analysis.** Report prevalence by cycle, sex, age and ethnicity with the NHANES survey weights (`WTMEC2YR` combined over cycles, strata `SDMVSTRA`, PSU `SDMVPSU`) so the figures describe the US adult population. Produce univariate risk ratios and a correlation check for collinear features (e.g. antidepressant use vs. mental-health visit).
 
-**Step 4 — Modelling.** Temporal split: **train 2005–2014 (26,057 adults, 983 cases) / test 2015–2018 (10,202 adults, 383 cases)**. Hyperparameters are tuned with stratified 5-fold cross-validation inside the training set only. We fit four nested feature sets (demographics → routine data → PHQ-8 only → routine + PHQ-8) with two algorithms:
+**Step 4 — Modelling.** Temporal split: **train 2005–2014 (26,057 adults, 983 cases) / test 2015–2018 (10,202 adults, 383 cases)**. Hyperparameters are tuned with stratified 5-fold cross-validation inside the training set only. We fit four nested feature sets (demographics → routine data → PHQ-9 only → routine + PHQ-8) with two algorithms:
 
 - **L2- or elastic-net logistic regression**, interpretable as odds ratios;
 - **gradient boosting** (scikit-learn `HistGradientBoostingClassifier` or XGBoost).
 
-The imbalance comparison (sub-question 1, H4) runs each model with no correction, with `class_weight="balanced"`, and with SMOTE applied inside the CV folds only.
+The imbalance comparison (sub-question 1, H3) runs each model three ways: with no correction, with balanced class weights, and with SMOTE applied inside the CV folds only.
 
 **Step 5 — Evaluation.**
 
 - Primary metric: **PR-AUC**, compared against the prevalence baseline. Secondary: ROC-AUC, Brier score and a calibration plot.
 - Clinical operating point: **recall and precision when flagging the top 5% of patients**, reported as "flag 1 in 20 patients → catch X% of cases, of whom Y% are true positives".
 - Hypothesis tests via bootstrap CIs on the test set.
-- Fairness (H5): ROC-AUC, PR-AUC relative to subgroup prevalence, and recall at top 5% by sex, age group and ethnicity.
+- Fairness (H4): ROC-AUC, PR-AUC relative to subgroup prevalence, and recall at top 5% by sex, age group and ethnicity.
 
 **Step 6 — Explainability.** SHAP values for the gradient-boosting model and odds ratios for logistic regression. Global importance ranking plus 2–3 individual patient explanations (e.g. "flagged mainly because of antipsychotic prescription, poor self-rated health and not working").
 
@@ -94,8 +82,8 @@ The imbalance comparison (sub-question 1, H4) runs each model with no correction
 
 - **Public, de-identified data.** NHANES is released for public research and needs no ethics approval. We report only aggregate results.
 - **Not a diagnostic tool.** The outcome is *self-reported ideation*, not suicide attempts or deaths, and the design is **cross-sectional**. The model *flags*; it does not *predict the future*. We discuss the harm of false positives (stigma, unnecessary referrals) and false negatives.
-- **Transferability.** The data are from the US; Swiss prescribing, insurance and care pathways differ. BFS figures are used for context only.
-- **Label quality.** PHQ item 9 captures passive thoughts as well as active ideation, so it is known to over-identify risk [3].
+- **Transferability.** The data are from the US.
+- **Label quality.** PHQ item 9 captures passive thoughts as well as active ideation, so it is known to over-identify risk [2].
 
 ## 6. Out of scope (future work)
 
@@ -114,12 +102,18 @@ NLP on clinical notes (ClinicalBERT), multimodal late fusion, and 30-day post-di
 | 22.10 – 28.10  | Slides (≤ 10), code clean-up, GenAI disclosure                                  | all          |
 | **28.10** | **Hand-in final project (.zip)** · 30.10 presentation in Lucerne          |              |
 
+## 8. Open point for step 4: PHQ-8 or PHQ-9?
+
+The submitted text uses the PHQ-9 score in H2 and in the leakage rule, but step 4 still lists "routine + PHQ-8". The two scores answer different questions, and step 1 provides both (`phq8_score`, `phq9_score`, `phq8_positive`, `phq9_positive`):
+
+- **As the screen (who counts as "screen negative"):** PHQ-9 ≥ 10 is the screen used in practice. With it, 34.6% of cases (472 of 1,366) screen negative. The 42% in the problem statement (579 cases) refers to the other eight items, i.e. PHQ-8 < 10.
+- **As a predictor:** the PHQ-9 score contains item 9, which is the outcome. All 107 adults whom item 9 moves from screen-negative to screen-positive are cases, and nobody with a PHQ-9 score of 0 can be a case. On the 2015–2018 test set the score alone reaches PR-AUC 0.42 with PHQ-9 against 0.32 with PHQ-8, a gain that comes only from the label. A PHQ-9 baseline in H2 is therefore inflated; the PHQ-8 score is the leakage-free baseline.
+
 ---
 
 ## References
 
-1. Bundesamt für Statistik (BFS). *Suizidmethoden nach Geschlecht, 1995–2024* (T 14.03.04.01.12) and *Assistierter Suizid nach Geschlecht und Alter* (T 14.03.04.01.14). opendata.swiss, accessed 25.09.2026.
-2. Ahmedani, B. K. et al. (2014). Health care contacts in the year before suicide death. *Journal of General Internal Medicine*, 29(6), 870–877.
-3. Kroenke, K., Spitzer, R. L., & Williams, J. B. W. (2001). The PHQ-9: validity of a brief depression severity measure. *Journal of General Internal Medicine*, 16(9), 606–613.
+1. Ahmedani, B. K. et al. (2014). Health care contacts in the year before suicide death. *Journal of General Internal Medicine*, 29(6), 870–877.
+2. Kroenke, K., Spitzer, R. L., & Williams, J. B. W. (2001). The PHQ-9: validity of a brief depression severity measure. *Journal of General Internal Medicine*, 16(9), 606–613.
+3. van den Goorbergh, R., van Smeden, M., Timmerman, D., & Van Calster, B. (2022). The harm of class imbalance corrections for risk prediction models: illustration and simulation using logistic regression. *Journal of the American Medical Informatics Association*, 29(9), 1525–1534.
 4. Centers for Disease Control and Prevention, National Center for Health Statistics. *National Health and Nutrition Examination Survey data, 2005–2018*. https://wwwn.cdc.gov/nchs/nhanes/, accessed 25.09.2026.
-5. van den Goorbergh, R., van Smeden, M., Timmerman, D., & Van Calster, B. (2022). The harm of class imbalance corrections for risk prediction models: illustration and simulation using logistic regression. *Journal of the American Medical Informatics Association*, 29(9), 1525–1534.

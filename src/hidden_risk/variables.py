@@ -199,7 +199,7 @@ VARIABLES = [
             min_age=20, note="Asked from age 20 until 2012, from 18 afterwards; set missing under 20."),
     Var("smoking_now", "SMQ", "SMQ040", "Do you now smoke cigarettes",
         values={1: "every day", 2: "some days", 3: "not at all"}, missing=(7, 9), min_age=20,
-        note="Only asked if smoked_100_cigarettes = yes."),
+        note="Only asked if smoked_100_cigarettes = yes, so it follows the same age rule."),
     _binary("ever_marijuana", "DUQ", "DUQ200", "Ever used marijuana or hashish",
             min_age=20, max_age=59,
             note="Asked to ages 20-59 (2005-08) or 18-59 (2009+); set missing under 20."),
@@ -234,9 +234,11 @@ DERIVED = {
     "cycle": "Survey cycle, e.g. 2005-2006",
     "split": "train (2005-2014) or test (2015-2018)",
     "weight_mec_pooled": "weight_mec / 7, for population estimates pooled over the 7 cycles",
-    "phq8_score": "Sum of PHQ items 1-8 (0-24)",
-    "phq9_score": "Sum of PHQ items 1-9 (0-27)",
-    "phq8_positive": "1 if phq8_score >= 10 (positive depression screen)",
+    "phq8_score": "Sum of PHQ items 1-8 (0-24): depression score without the outcome item",
+    "phq9_score": "Sum of PHQ items 1-9 (0-27). Contains the outcome item (phq_9), so it "
+                  "leaks the label if used as a predictor",
+    "phq8_positive": "1 if phq8_score >= 10 (positive screen on the other eight items)",
+    "phq9_positive": "1 if phq9_score >= 10 (positive depression screen as used in practice)",
     "si": "Outcome: 1 if phq_9 >= 1 (several days or more)",
     "si_strict": "Sensitivity outcome: 1 if phq_9 >= 2 (more than half the days or more)",
 }
