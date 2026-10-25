@@ -1,0 +1,5 @@
+screen,model,test_adults,test_cases,screen_positive,cases_caught_by_screen,cases_missed_by_screen,screen_negative_flagged_top5,missed_cases_caught_by_model,share_of_missed_cases_caught,precision_of_extra_flags,total_flagged,total_cases_caught,share_of_all_cases_caught
+PHQ9 >= 10,routine|hgb|none,10202,383,874,255,128,467,18,0.1406,0.0385,1341,273,0.7128
+PHQ9 >= 10,routine_phq8|lr|none,10202,383,874,255,128,467,29,0.2266,0.0621,1341,284,0.7415
+PHQ8 >= 10,routine|hgb|none,10202,383,849,230,153,468,24,0.1569,0.0513,1317,254,0.6632
+PHQ8 >= 10,routine_phq8|lr|none,10202,383,849,230,153,468,47,0.3072,0.1004,1317,277,0.7232

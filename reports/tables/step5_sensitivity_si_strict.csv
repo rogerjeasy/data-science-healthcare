@@ -1,0 +1,4 @@
+model,outcome,cases,prevalence,pr_auc,roc_auc,brier,recall_top5,precision_top5
+phq8|lr|none,si_strict,121,0.0119,0.2036,0.9321,0.0103,0.686,0.1624
+routine|hgb|none,si_strict,121,0.0119,0.046,0.7667,0.0116,0.281,0.0665
+routine_phq8|lr|none,si_strict,121,0.0119,0.2097,0.9319,0.0103,0.7025,0.1663

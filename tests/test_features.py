@@ -43,3 +43,14 @@ def test_questions_that_were_not_asked_stay_missing():
 def test_outcome_columns_are_not_features():
     forbidden = {"si", "si_strict", "phq_9", "phq9_score", "phq9_positive"}
     assert forbidden.isdisjoint(features().columns)
+
+def test_never_smokers_are_not_current_smokers_and_job_seekers_are_flagged():
+    persons = pd.read_parquet(PERSONS, columns=["smoked_100_cigarettes", "smoking_now", "work_status"])
+    out = features()
+    never = persons["smoked_100_cigarettes"].eq(0).fillna(False).to_numpy()
+    assert (out.loc[never, "current_smoker"] == 0).all()
+    assert out.loc[persons["smoking_now"].isin([1, 2]).to_numpy(), "current_smoker"].eq(1).all()
+    assert out["looking_for_work"].sum() == persons["work_status"].eq(3).sum()
+    assert out.loc[persons["smoked_100_cigarettes"].isna().to_numpy(), "current_smoker"].isna().all()
+    assert out.loc[persons["work_status"].isna().to_numpy(), ["not_working", "looking_for_work"]].isna().all().all()
+    assert {"sleep_trouble", "sleep_hours", "bmi", "high_cholesterol"} <= set(out.columns)

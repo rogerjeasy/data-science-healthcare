@@ -1,0 +1,7 @@
+feature_set,algorithm,strategy,cv_pr_auc,cv_roc_auc
+demographics,hgb,none,0.0582,0.589
+phq8,lr,none,0.2942,0.8985
+phq9,lr,none,0.3855,0.9262
+routine,hgb,none,0.1494,0.769
+routine_phq8,lr,none,0.3141,0.9017
+routine_phq9,hgb,none,0.4132,0.9288

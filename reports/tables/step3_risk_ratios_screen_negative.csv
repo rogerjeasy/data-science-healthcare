@@ -1,0 +1,31 @@
+variable,factor,n_exposed,cases_exposed,risk_exposed_pct,risk_unexposed_pct,rr,ci_low,ci_high
+rx_antipsychotic_mood,Antipsychotic / mood stabiliser,547,25,4.57,1.371,3.333,2.248,4.942
+mental_health_visit,Mental-health visit (12 mo),2104,71,3.375,1.291,2.613,2.038,3.351
+rx_antidepressant,Antidepressant,2756,87,3.157,1.267,2.492,1.981,3.135
+Fair / poor self-rated health,Fair / poor self-rated health,6677,173,2.591,1.129,2.295,1.906,2.762
+rx_benzo_z,Benzodiazepine / Z-drug,1175,32,2.723,1.376,1.979,1.389,2.82
+ever_injected_drugs,Ever injected drugs,415,11,2.651,1.375,1.927,1.063,3.494
+sleep_trouble,Told doctor about trouble sleeping,7213,161,2.232,1.198,1.862,1.542,2.249
+liver_condition,Liver condition,1119,28,2.502,1.376,1.818,1.246,2.654
+Below poverty line,Below poverty line,6133,132,2.152,1.237,1.74,1.42,2.131
+not_working,Not working,12861,247,1.921,1.113,1.725,1.442,2.064
+hospital_stay,Overnight hospital stay (12 mo),3602,79,2.193,1.333,1.645,1.295,2.09
+stroke,Stroke,1042,23,2.207,1.389,1.59,1.049,2.408
+3+ chronic conditions,3+ chronic conditions,5681,111,1.954,1.317,1.484,1.202,1.832
+rx_opioid,Opioid,1803,37,2.052,1.388,1.479,1.061,2.061
+cancer,Cancer,2940,59,2.007,1.364,1.471,1.121,1.93
+5+ distinct prescription drugs,5+ distinct prescription drugs,5016,98,1.954,1.329,1.47,1.179,1.832
+uninsured,Uninsured,6945,131,1.886,1.299,1.452,1.189,1.773
+looking_for_work,Looking for work,1192,24,2.013,1.405,1.433,0.954,2.152
+Divorced / separated,Divorced / separated,4166,80,1.92,1.348,1.424,1.121,1.81
+Never married,Never married,5520,103,1.866,1.33,1.403,1.128,1.746
+heart_disease,Heart disease,2434,47,1.931,1.381,1.398,1.036,1.886
+hypertension,Hypertension,10975,189,1.722,1.269,1.358,1.13,1.63
+diabetes,Diabetes,3859,70,1.814,1.376,1.318,1.025,1.695
+arthritis,Arthritis,8032,138,1.718,1.316,1.305,1.069,1.594
+asthma,Asthma,4595,77,1.676,1.384,1.211,0.95,1.542
+ever_hard_drugs,Ever cocaine / heroin / meth,3486,55,1.578,1.355,1.164,0.869,1.56
+current_smoker,Current smoker,5915,95,1.606,1.382,1.162,0.928,1.455
+lung_disease,Emphysema / chronic bronchitis,1919,31,1.615,1.412,1.144,0.797,1.644
+thyroid_problem,Thyroid problem,3031,41,1.353,1.431,0.945,0.687,1.301
+ever_marijuana,Ever marijuana,10549,140,1.327,1.477,0.898,0.712,1.133

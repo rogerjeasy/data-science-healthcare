@@ -1,0 +1,31 @@
+variable,factor,n_exposed,cases_exposed,risk_exposed_pct,risk_unexposed_pct,rr,ci_low,ci_high
+rx_antipsychotic_mood,Antipsychotic / mood stabiliser,813,125,15.375,3.5,4.393,3.705,5.208
+mental_health_visit,Mental-health visit (12 mo),2941,351,11.935,3.041,3.924,3.497,4.404
+Fair / poor self-rated health,Fair / poor self-rated health,8479,695,8.197,2.41,3.4,3.067,3.771
+rx_benzo_z,Benzodiazepine / Z-drug,1713,193,11.267,3.394,3.319,2.873,3.835
+rx_antidepressant,Antidepressant,3736,372,9.957,3.055,3.259,2.908,3.654
+sleep_trouble,Told doctor about trouble sleeping,9016,655,7.265,2.607,2.786,2.512,3.09
+stroke,Stroke,1284,106,8.255,3.561,2.318,1.915,2.806
+rx_opioid,Opioid,2365,181,7.653,3.495,2.19,1.883,2.546
+liver_condition,Liver condition,1395,107,7.67,3.572,2.147,1.775,2.598
+Below poverty line,Below poverty line,7231,463,6.403,2.984,2.146,1.918,2.401
+not_working,Not working,14807,808,5.457,2.603,2.096,1.886,2.33
+lung_disease,Emphysema / chronic bronchitis,2449,174,7.105,3.495,2.033,1.742,2.372
+5+ distinct prescription drugs,5+ distinct prescription drugs,6117,390,6.376,3.237,1.97,1.757,2.208
+3+ chronic conditions,3+ chronic conditions,6840,420,6.14,3.216,1.91,1.707,2.136
+current_smoker,Current smoker,7038,421,5.982,3.177,1.883,1.681,2.11
+hospital_stay,Overnight hospital stay (12 mo),4301,270,6.278,3.428,1.831,1.609,2.084
+heart_disease,Heart disease,2905,186,6.403,3.505,1.827,1.571,2.124
+ever_injected_drugs,Ever injected drugs,528,36,6.818,3.766,1.811,1.312,2.5
+Divorced / separated,Divorced / separated,4905,293,5.973,3.383,1.766,1.555,2.004
+arthritis,Arthritis,9396,498,5.3,3.154,1.681,1.506,1.876
+diabetes,Diabetes,4475,251,5.609,3.511,1.598,1.398,1.825
+ever_hard_drugs,Ever cocaine / heroin / meth,4080,223,5.466,3.473,1.574,1.356,1.827
+looking_for_work,Looking for work,1339,76,5.676,3.696,1.536,1.226,1.923
+asthma,Asthma,5357,285,5.32,3.499,1.521,1.339,1.727
+uninsured,Uninsured,7761,394,5.077,3.404,1.492,1.33,1.672
+hypertension,Hypertension,12438,580,4.663,3.29,1.417,1.276,1.575
+Never married,Never married,6145,294,4.784,3.53,1.355,1.193,1.539
+cancer,Cancer,3286,154,4.687,3.647,1.285,1.09,1.515
+thyroid_problem,Thyroid problem,3513,164,4.668,3.634,1.285,1.094,1.508
+ever_marijuana,Ever marijuana,11891,496,4.171,3.491,1.195,1.046,1.365
