@@ -19,7 +19,13 @@ data-science-healthcare/
 ├── scripts/                      # command-line entry points, run in this order
 │   ├── fetch_data.py             # step 1a: download and verify the raw data
 │   ├── checksums.sha256          # SHA-256 of every raw file, so everyone has the same data
-│   └── build_dataset.py          # step 1b: merge and harmonise
+│   ├── build_dataset.py          # step 1b: merge and harmonise
+│   ├── build_features.py         # step 2: medication classes, multimorbidity, social flags
+│   ├── run_eda.py                # step 3: weighted prevalence with CIs, risk ratios, collinearity
+│   ├── train_models.py           # step 4: tune and fit all models on 2005-2014 (~30 min)
+│   ├── evaluate_models.py        # step 5: test metrics, bootstrap tests H1-H4, fairness
+│   ├── explain_models.py         # step 6: odds ratios, SHAP
+│   └── write_results.py          # docs/results.md from reports/tables
 ├── src/hidden_risk/              # all reusable code; imported by scripts, notebooks and tests
 │   ├── config.py                 # paths, survey cycles, train/test split
 │   ├── sources.py                # list of raw files, download URLs, checksum check
@@ -29,8 +35,14 @@ data-science-healthcare/
 │   ├── cohort.py                 # adults with a complete PHQ-9, outcome, depression screens
 │   ├── reports.py                # sample-size and missingness tables, codebook, appendix
 │   ├── build.py                  # runs step 1: writes data/processed, reports/tables, docs
-│   └── plotting.py               # one chart style for every figure
-├── notebooks/                    # exploration only, numbered: 01_eda.ipynb, 02_...
+│   ├── plotting.py               # one chart style for every figure
+│   ├── features.py               # step 2
+│   ├── eda.py                    # step 3
+│   ├── models.py                 # step 4: feature sets, pipelines, CV tuning
+│   ├── evaluation.py             # step 5
+│   ├── explain.py                # step 6
+│   └── summary.py                # writes docs/results.md
+├── notebooks/                    # 01 data overview, 03 step 3, 04 steps 4-6 (show outputs only)
 ├── reports/
 │   ├── tables/                   # aggregate tables (committed)
 │   └── figures/                  # plots for slides and report
@@ -42,7 +54,7 @@ data-science-healthcare/
     └── processed/                # analysis-ready .parquet files
 ```
 
-**Where code goes:** anything used more than once belongs in `src/hidden_risk/`, not in a notebook. Notebooks import from it (`from hidden_risk.config import DATA_PROCESSED`) and only explore and plot. Step 2 (features) and step 4 (models) will add `features.py` and `models.py` next to the existing modules.
+**Where code goes:** anything used more than once belongs in `src/hidden_risk/`, not in a notebook. Notebooks import from it (`from hidden_risk.config import DATA_PROCESSED`) and only explore and plot.
 
 ## 1. Setup (once)
 
@@ -145,6 +157,19 @@ jupyter lab notebooks/01_data_overview.ipynb
 ```
 
 `01_data_overview` shows the cohort, suicidal ideation over time, the cases the depression screen misses, subgroups, crude risk ratios and missing data. It also saves its charts to `reports/figures/` for the report and slides. For new charts, call `use_style()` from `hidden_risk.plotting` so every figure shares the same colour-blind-safe style. If you use VS Code instead, open the notebook and choose the `.venv` kernel.
+
+## 5. Steps 2–6: features, analysis, models
+
+```bash
+python scripts/build_features.py    # step 2 -> data/processed/nhanes_2005_2018_features.parquet
+python scripts/run_eda.py           # step 3 -> reports/tables/step3_*, figures 06-08
+python scripts/train_models.py      # step 4 -> reports/tables/step4_*, test predictions, models (~30 min)
+python scripts/evaluate_models.py   # step 5 -> reports/tables/step5_*, figures 09-13
+python scripts/explain_models.py    # step 6 -> reports/tables/step6_*, figures 14-17
+python scripts/write_results.py     # -> docs/results.md
+```
+
+All results are in [`docs/results.md`](docs/results.md). Models are tuned with stratified 5-fold CV on 2005–2014 only; the algorithm per feature set is chosen by CV PR-AUC, so the 2015–2018 test set is used once, for evaluation.
 
 ## Data rules
 

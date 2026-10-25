@@ -1,0 +1,19 @@
+patient,predicted_risk,phq9_score,feature,value,shap_log_odds
+Patient A,0.3665,3.0,ethnicity,2.0,0.6166
+Patient A,0.3665,3.0,mental_health_visit,1.0,0.58
+Patient A,0.3665,3.0,self_rated_health,4.0,0.513
+Patient A,0.3665,3.0,rx_antipsychotic_mood,1.0,0.4587
+Patient A,0.3665,3.0,sleep_hours,12.0,0.3805
+Patient A,0.3665,3.0,uninsured,1.0,0.2717
+Patient B,0.2815,8.0,income_poverty_ratio,0.12,0.6269
+Patient B,0.2815,8.0,self_rated_health,4.0,0.6221
+Patient B,0.2815,8.0,sleep_trouble,1.0,0.2798
+Patient B,0.2815,8.0,bmi,54.7,0.2288
+Patient B,0.2815,8.0,uninsured,1.0,0.2284
+Patient B,0.2815,8.0,ever_hard_drugs,1.0,0.1858
+Patient C,0.2435,9.0,mental_health_visit,1.0,0.5703
+Patient C,0.2435,9.0,rx_antidepressant,1.0,0.5499
+Patient C,0.2435,9.0,sleep_hours,3.5,0.4486
+Patient C,0.2435,9.0,rx_antipsychotic_mood,1.0,0.4141
+Patient C,0.2435,9.0,sleep_trouble,1.0,0.232
+Patient C,0.2435,9.0,income_poverty_ratio,,0.2197

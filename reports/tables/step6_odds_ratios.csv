@@ -1,0 +1,50 @@
+feature,unit,odds_ratio,ci_low,ci_high,p_value
+missing: arthritis,,2.1671,1.2742,3.6857,0.0043
+rx_antidepressant,,1.8868,1.5407,2.3106,0.0
+mental_health_visit,,1.8548,1.5224,2.2597,0.0
+ethnicity: Other Hispanic,,1.8335,1.4772,2.2757,0.0
+marital: never married,,1.6345,1.3298,2.009,0.0
+stroke,,1.5979,1.2225,2.0885,0.0006
+marital: divorced,,1.5653,1.2616,1.9421,0.0
+rx_benzo_z,,1.5287,1.2134,1.9258,0.0003
+marital: separated,,1.5283,1.1228,2.0804,0.007
+sleep_trouble,,1.5107,1.2823,1.7798,0.0
+self_rated_health,,1.4943,1.3819,1.6158,0.0
+marital: widowed,,1.4812,1.1408,1.9233,0.0032
+not_working,,1.4565,1.2319,1.722,0.0
+marital: living with partner,,1.4546,1.1221,1.8856,0.0047
+uninsured,,1.4464,1.2228,1.7109,0.0
+rx_antipsychotic_mood,,1.3646,1.0177,1.8296,0.0378
+looking_for_work,,1.2407,0.8762,1.7567,0.2242
+missing: bmi,,1.2322,0.7485,2.0286,0.4116
+current_smoker,,1.2076,0.9827,1.484,0.0728
+ethnicity: Mexican American,,1.1946,0.9663,1.4769,0.1003
+cancer,,1.1797,0.936,1.4868,0.1616
+missing: income_poverty_ratio,,1.1494,0.911,1.4501,0.2404
+diabetes,,1.1364,0.9234,1.3984,0.2273
+liver_condition,,1.1059,0.831,1.4716,0.4899
+missing: high_cholesterol,,1.0863,0.7357,1.6042,0.6771
+hypertension,,1.0804,0.9138,1.2775,0.3655
+heart_disease,,1.0727,0.8526,1.3496,0.5494
+high_cholesterol,,1.0709,0.9111,1.2587,0.4061
+healthcare_visits,,1.0402,0.9828,1.101,0.1731
+asthma,,1.0401,0.8688,1.2452,0.6685
+ever_hard_drugs,,1.0396,0.8267,1.3073,0.74
+sex,female vs male,1.035,0.8941,1.1981,0.6451
+arthritis,,1.0218,0.8593,1.2152,0.8069
+age,per 10,0.9895,0.9165,1.0684,0.7882
+lung_disease,,0.9864,0.783,1.2428,0.9077
+ethnicity: Non-Hispanic Black,,0.9835,0.8122,1.1909,0.8646
+rx_opioid,,0.9822,0.7799,1.237,0.8786
+n_drugs,per 1,0.9735,0.9405,1.0076,0.126
+hospital_stay,,0.9699,0.8062,1.1667,0.7454
+bmi,per 5,0.9653,0.9195,1.0134,0.1549
+sleep_hours,per 1,0.9441,0.9054,0.9845,0.0071
+thyroid_problem,,0.936,0.7462,1.1741,0.5673
+smoked_100_cigarettes,,0.9342,0.7718,1.1307,0.4847
+ethnicity: Other / multi-racial,,0.9166,0.6771,1.2407,0.5729
+education,,0.9013,0.8456,0.9606,0.0014
+income_poverty_ratio,per 1,0.8991,0.8486,0.9526,0.0003
+ever_injected_drugs,,0.8711,0.5521,1.3745,0.5532
+ever_marijuana,,0.843,0.6909,1.0285,0.0924
+missing: ever_marijuana,,0.6457,0.5028,0.8291,0.0006

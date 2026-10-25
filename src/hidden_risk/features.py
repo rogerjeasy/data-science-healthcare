@@ -24,7 +24,8 @@ COPIED = [
     "seqn", "cycle", "split", "age", "sex", "ethnicity",
     "hospital_stay", "mental_health_visit", "healthcare_visits", "self_rated_health",
     "income_poverty_ratio", "education", "marital_status",
-    "smoked_100_cigarettes", "smoking_now",
+    "sleep_trouble", "sleep_hours", "bmi", "high_cholesterol",
+    "smoked_100_cigarettes",
     "ever_marijuana", "ever_hard_drugs", "ever_injected_drugs",
 ]
 Z_DRUGS = "ZOLPIDEM|ZALEPLON|ESZOPICLONE"
@@ -63,9 +64,11 @@ def _yes(block: pd.DataFrame) -> pd.Series:
     return out.mask(known, 0).mask(yes, 1).astype("Int16")
 
 
-def _flag(series: pd.Series, when_true) -> pd.Series:
+def _flag(series: pd.Series, when_true: pd.Series) -> pd.Series:
+    """1 where when_true, 0 where series is known, NA where series is missing."""
     out = pd.Series(pd.NA, index=series.index, dtype="Int16")
-    return out.mask(series.notna(), 0).mask(when_true, 1).astype("Int16")
+    # pandas treats NA in a mask condition as True, so missing answers must be False explicitly
+    return out.mask(series.notna(), 0).mask(when_true.fillna(False).astype(bool), 1).astype("Int16")
 
 
 def medication_features(persons: pd.DataFrame, prescriptions: pd.DataFrame,
@@ -113,12 +116,16 @@ def build_features(persons: pd.DataFrame, prescriptions: pd.DataFrame,
                    lookup: pd.DataFrame) -> pd.DataFrame:
     """One row per adult. Does not read phq_9, phq9_score, si or si_strict."""
     age = persons["age"]
+    work = persons["work_status"]
+    # smoking_now is only asked if smoked_100_cigarettes = yes: never smokers are not current smokers
+    smoking = persons["smoking_now"].mask(persons["smoked_100_cigarettes"].eq(0).fillna(False).astype(bool), 3)
     extra = pd.DataFrame({
-        "not_working": _flag(persons["work_status"], persons["work_status"].eq(4)),
+        "not_working": _flag(work, work.eq(4)),
+        "looking_for_work": _flag(work, work.eq(3)),
         "uninsured": _flag(persons["insured"], persons["insured"].eq(0)),
+        "current_smoker": _flag(smoking, smoking.isin([1, 2])),
         "not_asked_under_20": (age < 20).astype("Int16"),
         "not_asked_drug_use": ((age < 20) | (age > 59)).astype("Int16"),
-        "not_asked_smoking": (age < 20).astype("Int16"),
     })
     return pd.concat(
         [

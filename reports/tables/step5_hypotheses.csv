@@ -1,0 +1,17 @@
+hypothesis,comparison,metric,estimate,ci_low,ci_high,criterion,supported
+H1,routine (hgb) PR-AUC - 2 x prevalence,pr_auc,0.0659,0.0439,0.0975,CI lower bound > 0,True
+H1,routine - demographics,pr_auc,0.0974,0.0749,0.1279,CI of difference > 0,True
+H2,routine + PHQ-8 - PHQ-8 (leakage-free),pr_auc,0.0155,-0.0004,0.0321,CI of difference > 0,False
+H2,routine + PHQ-9 - PHQ-9 (as registered; PHQ-9 contains the outcome item),pr_auc,0.0079,-0.0124,0.028,CI of difference > 0,False
+H3,routine lr: balanced - none,pr_auc,0.002,-0.0025,0.0073,no improvement: CI lower bound <= 0,True
+H3,routine lr: balanced - none,brier,0.1526,0.1481,0.1572,worse calibration: CI of Brier difference > 0,True
+H3,routine lr: smote - none,pr_auc,-0.0022,-0.0107,0.0052,no improvement: CI lower bound <= 0,True
+H3,routine lr: smote - none,brier,0.158,0.1536,0.1626,worse calibration: CI of Brier difference > 0,True
+H3,routine hgb: balanced - none,pr_auc,-0.0025,-0.0149,0.0082,no improvement: CI lower bound <= 0,True
+H3,routine hgb: balanced - none,brier,0.1528,0.148,0.1573,worse calibration: CI of Brier difference > 0,True
+H3,routine hgb: smote - none,pr_auc,-0.0638,-0.0885,-0.0434,no improvement: CI lower bound <= 0,True
+H3,routine hgb: smote - none,brier,0.012,0.0108,0.0133,worse calibration: CI of Brier difference > 0,True
+H4,routine test ROC-AUC - CV ROC-AUC (0.769),roc_auc,-0.0018,-0.0257,0.0218,|difference| < 0.05,True
+H4,ROC-AUC gap by sex: Women - Men,roc_auc,0.0259,-0.0216,0.0732,gap < 0.05,True
+H4,ROC-AUC gap by age group: 60-80 - 18-29,roc_auc,0.0565,-0.018,0.1317,gap < 0.05,False
+H4,ROC-AUC gap by ethnicity: Other Hispanic - Other / multi-racial,roc_auc,0.0461,-0.0417,0.1423,gap < 0.05,True
